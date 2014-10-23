@@ -21,7 +21,6 @@ void communicate() {
   //These are for float input instead.  Since I'm using it as an index, this is less useful for now:
   //inputString.substring(inputString.indexOf('@')+1).toCharArray(valtemp, sizeof(valtemp)); //Jankety conversion to floats
   //val=atof(valtemp);
-  
   if (cmd.equals(String("start"))) {
     val=max(0,min(13,val)); //Hopefully this isn't needed..
     values[val]=1;
@@ -32,6 +31,8 @@ void communicate() {
     values[val]=0;
     Serial.print("Pin ") && Serial.print(val) && Serial.println(" disabled.");
   }
+  stringComplete=false;
+  inputString = "";
   
 }
 

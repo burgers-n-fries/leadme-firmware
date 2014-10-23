@@ -24,6 +24,11 @@ void communicate() {
   //inputString.substring(inputString.indexOf('@')+1).toCharArray(valtemp, sizeof(valtemp)); //Jankety conversion to floats
   //val=atof(valtemp);
   
+  if (cmd.equals(String("duty"))) {
+    val=max(0,min(255,val)); //Hopefully this isn't needed..
+    cycle=val;
+    Serial.print("Duty cylcle set to ") && Serial.print(val) && Serial.println(".");
+  }
   if (cmd.equals(String("start"))) {
     val=max(0,min(13,val)); //Hopefully this isn't needed..
     duty[val]=cycle;
@@ -34,6 +39,9 @@ void communicate() {
     duty[val]=0;
     Serial.print("PWM ") && Serial.print(val) && Serial.println(" stopped.");
   }
+  
+  stringComplete=false;
+  inputString = "";
   
 }
 
