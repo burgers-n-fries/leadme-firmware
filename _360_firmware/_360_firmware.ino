@@ -1,14 +1,17 @@
 /*
+Number of sensor is set by num_vib.
 Serial command is "angle@[angle]" where [angle] is 0-359 (or more, it's moded, don't worry).
-Once given, the approriate thingies vibrate.  They are faded if the angle is not a multiple of 45.
+Once given, the approriate thingies vibrate.  They are faded if the angle is not a multiple of (360/num_vib).
 The first 6 are the 6 PWM pins, in increasing number order.
-For the next 2, we'll serial over a comand to a second chip.  It'll be good.
+If more are needed, we'll serial over a command to a second chip.  It'll be good.
 If you send a negative number, they all stop.
 Enjoy.
 D
 */
 
-int duty[8]={0};
+const int num_vib=3;
+
+int duty[num_vib]={0};
 int angle=-1;
 int base=0;
 int add=0;
@@ -26,16 +29,16 @@ void communicate() {
   
   if (cmd.equals(String("angle"))) {
     angle=(max(-1,val))%360;
-    for(i=0;i<8;i++) {
+    for(i=0;i<num_vib;i++) {
       duty[i]=0;
     }
     if(angle>=0) {
-      base=angle/45;
-      add=angle%45;
-      duty[base%8]=(255*(45-add))/45;
-      duty[(base+1)%8]=(255*add)/45;
+      base=angle/(360/num_vib);
+      add=angle%(360/num_vib);
+      duty[base%num_vib]=(255*((360/num_vib)-add))/(360/num_vib);
+      duty[(base+1)%num_vib]=(255*add)/(360/num_vib);
     }
-    for(i=0;i<8;i++){
+    for(i=0;i<num_vib;i++){
     Serial.print(duty[i])&&Serial.print(',');
     }
     Serial.println();
@@ -60,9 +63,11 @@ void loop() {
   analogWrite(3,duty[0]);
   analogWrite(5,duty[1]);
   analogWrite(6,duty[2]);
-  analogWrite(9,duty[3]);
-  analogWrite(10,duty[4]);
-  analogWrite(11,duty[5]);
+  //analogWrite(9,duty[3]);
+  //analogWrite(10,duty[4]);
+  //analogWrite(11,duty[5]);
+  //digitalWrite(12,duty[6]);
+  //digitalWrite(13,duty[7]);
 }
 
 void serialEvent() { //This gets run every time after loop
