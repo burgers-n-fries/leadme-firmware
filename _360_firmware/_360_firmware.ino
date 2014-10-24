@@ -17,11 +17,16 @@ int base=0;
 int add=0;
 int i;
 
+int battery_level=100;
+
 /*Serial*/
 String inputString=""; //Initiate Serial input command variables
 String cmd="";
 int val=0;
 boolean stringComplete=false; //Don't run debuging info until a command is entered
+
+void update_bl() {
+}
 
 void communicate() {
   cmd=inputString.substring(0,inputString.indexOf('@')); //Split the input into command and value. The only reason this isn't '=' is because I like '@'
@@ -38,17 +43,28 @@ void communicate() {
       duty[base%num_vib]=(255*((360/num_vib)-add))/(360/num_vib);
       duty[(base+1)%num_vib]=(255*add)/(360/num_vib);
     }
-    for(i=0;i<num_vib;i++){
-    Serial.print(duty[i])&&Serial.print(',');
-    }
-    Serial.println();
   }
   
+  if(cmd.equals(String("all"))) {
+    for(i=0;i<num_vib;i++) {
+      duty[i]=255;
+    }
+  }
+
+  if(cmd.equals(String("batt"))) {
+    Serial.print(battery_level);
+  }
+
+  Serial.print("PWM Values: ");
+  for(i=0;i<num_vib;i++){
+    Serial.print(duty[i])&&Serial.print(',');
+  }
+  Serial.println();
+
   stringComplete=false;
   inputString = "";
   
 }
-
 void setup() {
   Serial.begin(9600);
   while (!Serial) {;} //some Arduinos take a while...
@@ -59,6 +75,7 @@ void setup() {
 }
 
 void loop() {
+  update_bl();
   if(stringComplete) {communicate();} //update PWM duty cycles
   analogWrite(3,duty[0]);
   analogWrite(5,duty[1]);
