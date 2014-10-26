@@ -90,7 +90,7 @@ void loop() {
 void serialEvent() { //This gets run every time after loop
     while (Serial.available()) {
         char inChar = (char)Serial.read();
-        if (inChar == '\n') {
+        if (inChar == '!') {
             inputString.trim(); //Get rid of the \n
             stringComplete = true; //The loop will run next time!
         }
