@@ -9,7 +9,7 @@ Enjoy.
 D
 */
 
-const int num_vib=3;
+const int num_vib=5;
 
 int duty[num_vib]={0};
 int angle=-1;
@@ -18,6 +18,8 @@ int add=0;
 int i;
 
 int battery_level=100;
+boolean demo=false;
+int demo_time;
 
 /*Serial*/
 String inputString=""; //Initiate Serial input command variables
@@ -31,6 +33,7 @@ void update_bl() {
 void communicate() {
   cmd=inputString.substring(0,inputString.indexOf('@')); //Split the input into command and value. The only reason this isn't '=' is because I like '@'
   val=inputString.substring(inputString.indexOf('@')+1).toInt();
+  demo=false;
   
   if (cmd.equals(String("angle"))) {
     angle=(max(-1,val))%360;
@@ -43,6 +46,11 @@ void communicate() {
       duty[base%num_vib]=(255*((360/num_vib)-add))/(360/num_vib);
       duty[(base+1)%num_vib]=(255*add)/(360/num_vib);
     }
+  }
+  
+  if (cmd.equals(String("test"))) {
+    demo=true;
+    Serial.print("Demo Time!");
   }
   
   if(cmd.equals(String("all"))) {
@@ -77,11 +85,21 @@ void setup() {
 void loop() {
   update_bl();
   if(stringComplete) {communicate();} //update PWM duty cycles
-  analogWrite(3,duty[0]);
-  analogWrite(5,duty[1]);
-  analogWrite(6,duty[2]);
-  //analogWrite(9,duty[3]);
-  //analogWrite(10,duty[4]);
+  if(demo) {
+    demo_time=(millis()%1000)/4;
+    analogWrite(3,((demo_time+0*255/num_vib)%255));
+    analogWrite(5,((demo_time+1*255/num_vib)%255));
+    analogWrite(6,((demo_time+2*255/num_vib)%255));
+    analogWrite(9,((demo_time+3*255/num_vib)%255));
+    analogWrite(10,((demo_time+4*255/num_vib)%255));
+  }
+  else {
+    analogWrite(3,duty[0]);
+    analogWrite(5,duty[1]);
+    analogWrite(6,duty[2]);
+    analogWrite(9,duty[3]);
+    analogWrite(10,duty[4]);
+  }
   //analogWrite(11,duty[5]);
   //digitalWrite(12,duty[6]);
   //digitalWrite(13,duty[7]);
